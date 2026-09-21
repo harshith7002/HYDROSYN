@@ -8,22 +8,23 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Inter+Tight:wght@500&display=swap" rel="stylesheet">
   <style>
+    /* ─────────────────────────────────────────
+       TOKENS & RESET
+    ───────────────────────────────────────── */
     :root {
       --u: min(100vw / 1357, 100dvh / 871);
       --ink: #ffffff;
-      --glass: rgba(255, 255, 255, .155);
-      --glass-line: rgba(255, 255, 255, .20);
-      --e-out: cubic-bezier(.16, 1, .3, 1);
+      --glass: rgba(255,255,255,.155);
+      --glass-line: rgba(255,255,255,.20);
+      --e-out:  cubic-bezier(.16, 1, .3, 1);
       --e-soft: cubic-bezier(.22, .61, .36, 1);
-      --e-pen: cubic-bezier(.37, .01, .2, 1);
+      --e-pen:  cubic-bezier(.37, .01, .2, 1);
     }
     @supports not (height: 100dvh) {
-      :root {
-        --u: min(100vw / 1357, 100vh / 871);
-      }
+      :root { --u: min(100vw / 1357, 100vh / 871); }
     }
 
-    * {
+    *, *::before, *::after {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
@@ -36,14 +37,14 @@
       width: 100%;
       height: 100%;
       overflow: hidden;
-      background-color: #04121b;
+      background: #04121b;
       color: var(--ink);
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
     }
 
-    /* ═══════════════════════════════════════
-       STAGE & VIGNETTE
-       ═══════════════════════════════════════ */
+    /* ─────────────────────────────────────────
+       STAGE & BACKGROUND
+    ───────────────────────────────────────── */
     .stage {
       position: fixed;
       inset: 0;
@@ -52,8 +53,21 @@
       background-size: cover;
       background-position: center 25%;
       background-repeat: no-repeat;
+      /* fallback if no image */
+      background-color: #071c28;
     }
 
+    /* SVG atmospheric fallback layered over bg */
+    .stage-atm {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Stage vignette overlay */
     .stage::after {
       content: '';
       position: absolute;
@@ -66,24 +80,29 @@
       z-index: 1;
     }
 
+    /* Everything on top of vignette */
     .stage-content {
-      position: relative;
-      width: 100%;
-      height: 100%;
+      position: absolute;
+      inset: 0;
       z-index: 2;
     }
 
-    /* ═══════════════════════════════════════
-       SIDEBAR
-       ═══════════════════════════════════════ */
+    /* ─────────────────────────────────────────
+       LEFT SIDEBAR
+    ───────────────────────────────────────── */
     .sidebar {
       position: absolute;
-      left: calc(16 * var(--u));
-      top: calc(14 * var(--u));
-      bottom: calc(7 * var(--u));
-      width: calc(72 * var(--u));
+      left:   calc(16 * var(--u));
+      top:    calc(14 * var(--u));
+      bottom: calc(7  * var(--u));
+      width:  calc(72 * var(--u));
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding-top:    calc(22 * var(--u));
+      padding-bottom: calc(52 * var(--u));
       background: linear-gradient(180deg,
-        rgba(255,255,255,.125) 0%,
+        rgba(255,255,255,.125)  0%,
         rgba(255,255,255,.135) 13%,
         rgba(255,255,255,.098) 34%,
         rgba(255,255,255,.092) 100%);
@@ -91,35 +110,28 @@
       -webkit-backdrop-filter: blur(calc(18 * var(--u))) saturate(115%);
       border-radius: calc(26 * var(--u));
       border: 1px solid var(--glass-line);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: space-between;
-      padding-top: calc(22 * var(--u));
-      padding-bottom: calc(52 * var(--u));
-      z-index: 10;
       animation: slideL .92s var(--e-out) .05s both;
     }
 
-    .active-pip {
+    /* Active nav pip */
+    .sidebar-pip {
       position: absolute;
-      left: calc(-2 * var(--u));
-      top: calc(131 * var(--u));
-      width: calc(5 * var(--u));
+      left:   calc(-2 * var(--u));
+      top:    calc(131 * var(--u));
+      width:  calc(5  * var(--u));
       height: calc(29 * var(--u));
       border-radius: calc(3 * var(--u));
       background: #ffffff;
       box-shadow: 0 0 calc(10 * var(--u)) rgba(255,255,255,.55);
-      transform-origin: center;
+      transform-origin: center top;
       animation: growY .50s var(--e-out) .68s both;
     }
 
+    /* Logo */
     .logo {
-      width: calc(40 * var(--u));
+      width:  calc(40 * var(--u));
       height: calc(40 * var(--u));
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      flex-shrink: 0;
       animation: popIn .70s var(--e-out) .26s both;
     }
     .logo svg {
@@ -127,41 +139,38 @@
       height: 100%;
     }
 
+    /* Nav */
     .nav {
       margin-top: calc(57.5 * var(--u));
       display: flex;
       flex-direction: column;
-      gap: calc(43 * var(--u));
       align-items: center;
+      gap: calc(43 * var(--u));
+      list-style: none;
     }
 
     .nav-link {
       display: flex;
       align-items: center;
       justify-content: center;
-      width: calc(23 * var(--u));
+      width:  calc(23 * var(--u));
       height: calc(23 * var(--u));
-      color: #ffffff;
+      color: rgba(255,255,255,.65);
       text-decoration: none;
-      opacity: .85;
-      transition: opacity .2s ease, transform .2s ease;
-    }
-    .nav-link:hover {
-      opacity: 1;
-      transform: translateY(calc(-1 * var(--u)));
-    }
-    .nav-link[aria-current="page"] {
-      opacity: 1;
+      transition: opacity .18s, transform .18s;
     }
     .nav-link svg {
-      width: calc(23 * var(--u));
-      height: calc(23 * var(--u));
+      width: 100%;
+      height: 100%;
       fill: none;
       stroke: currentColor;
-      stroke-width: 1.8;
+      stroke-width: 1.75;
       stroke-linecap: round;
       stroke-linejoin: round;
     }
+    .nav-link[aria-current="page"] { color: #ffffff; }
+    .nav-link:hover { opacity: 1; transform: translateY(calc(-1 * var(--u))); color: #ffffff; }
+    .nav-link:focus-visible { outline: calc(2 * var(--u)) solid #ffffff; outline-offset: calc(2 * var(--u)); border-radius: calc(4 * var(--u)); }
 
     .nav-item-1 { animation: riseIn .60s var(--e-out) .36s both; }
     .nav-item-2 { animation: riseIn .60s var(--e-out) .41s both; }
@@ -169,69 +178,68 @@
     .nav-item-4 { animation: riseIn .60s var(--e-out) .51s both; }
     .nav-item-5 { animation: riseIn .60s var(--e-out) .56s both; }
 
+    /* Logout */
     .logout {
       display: flex;
       align-items: center;
       justify-content: center;
-      width: calc(23 * var(--u));
+      width:  calc(23 * var(--u));
       height: calc(23 * var(--u));
-      color: #ffffff;
-      opacity: .85;
+      color: rgba(255,255,255,.55);
       text-decoration: none;
-      transition: opacity .2s ease, transform .2s ease;
+      margin-top: auto;
+      transition: opacity .18s, transform .18s;
       animation: riseIn .60s var(--e-out) .70s both;
     }
-    .logout:hover {
-      opacity: 1;
-      transform: translateY(calc(-1 * var(--u)));
-    }
     .logout svg {
-      width: calc(23 * var(--u));
-      height: calc(23 * var(--u));
+      width: 100%;
+      height: 100%;
       fill: none;
       stroke: currentColor;
-      stroke-width: 1.8;
+      stroke-width: 1.75;
       stroke-linecap: round;
       stroke-linejoin: round;
     }
+    .logout:hover { color: #ffffff; transform: translateY(calc(-1 * var(--u))); }
+    .logout:focus-visible { outline: calc(2 * var(--u)) solid #ffffff; outline-offset: calc(2 * var(--u)); border-radius: calc(4 * var(--u)); }
 
-    /* ═══════════════════════════════════════
+    /* ─────────────────────────────────────────
        HEADER
-       ═══════════════════════════════════════ */
+    ───────────────────────────────────────── */
     .header {
       position: absolute;
-      top: calc(22 * var(--u));
-      left: calc(126 * var(--u));
-      right: calc(37 * var(--u));
+      top:   calc(22 * var(--u));
+      left:  calc(126 * var(--u));
+      right: calc(37  * var(--u));
       height: calc(52 * var(--u));
       display: flex;
       align-items: center;
       justify-content: space-between;
-      z-index: 10;
     }
 
     .greeting {
       display: flex;
       flex-direction: column;
     }
-
-    .hello {
-      font-size: calc(16 * var(--u));
+    .greeting-hello {
+      font-size:   calc(16 * var(--u));
       font-weight: 400;
       color: rgba(255,255,255,.93);
       line-height: 1;
       animation: riseIn .70s var(--e-out) .14s both;
     }
-
-    .who {
-      font-size: calc(19.5 * var(--u));
-      font-weight: 700;
+    .greeting-who {
+      font-size:      calc(19.5 * var(--u));
+      font-weight:    700;
       letter-spacing: calc(-0.35 * var(--u));
-      margin-top: calc(5 * var(--u));
-      line-height: 1.1;
       color: #ffffff;
+      margin-top: calc(13 * var(--u));  /* spec: 13u vertical between the two lines (total height ~52u) */
+      line-height: 1;
       animation: riseIn .80s var(--e-out) .22s both;
     }
+
+    /* Actually the greeting stacks — let's treat top as the space above hello */
+    .greeting-hello { margin-top: 0; }
 
     .tools {
       display: flex;
@@ -240,48 +248,44 @@
     }
 
     .tool {
-      width: calc(52 * var(--u));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width:  calc(52 * var(--u));
       height: calc(52 * var(--u));
       border-radius: 50%;
       background: rgba(255,255,255,.15);
       backdrop-filter: blur(calc(16 * var(--u))) saturate(115%);
       -webkit-backdrop-filter: blur(calc(16 * var(--u))) saturate(115%);
       border: 1px solid var(--glass-line);
-      display: flex;
-      align-items: center;
-      justify-content: center;
       color: #ffffff;
       cursor: pointer;
-      text-decoration: none;
-      transition: background .2s ease, transform .2s ease, border-color .2s ease;
-    }
-    .tool:hover {
-      background: rgba(255,255,255,.24);
-      border-color: rgba(255,255,255,.35);
-    }
-    .tool:focus-visible {
-      outline: calc(2 * var(--u)) solid #ffffff;
-      outline-offset: calc(2 * var(--u));
+      transition: background .18s;
+      position: relative;
+      overflow: hidden;
     }
     .tool svg {
-      width: calc(20 * var(--u));
+      width:  calc(20 * var(--u));
       height: calc(20 * var(--u));
       fill: none;
       stroke: currentColor;
-      stroke-width: 1.8;
+      stroke-width: 1.75;
       stroke-linecap: round;
       stroke-linejoin: round;
     }
+    .tool:hover { background: rgba(255,255,255,.24); }
+    .tool:focus-visible { outline: calc(2 * var(--u)) solid #ffffff; outline-offset: calc(2 * var(--u)); }
 
-    .tool-1 { animation: popIn .58s var(--e-out) .30s both; }
+    .tool-1 { animation: popIn .58s var(--e-out) .300s both; }
     .tool-2 { animation: popIn .58s var(--e-out) .365s both; }
-    .tool-3 { animation: popIn .58s var(--e-out) .43s both; }
+    .tool-3 { animation: popIn .58s var(--e-out) .430s both; }
     .tool-4 { animation: popIn .58s var(--e-out) .495s both; }
 
+    /* Avatar button */
     .avatar-btn {
       padding: 0;
-      overflow: hidden;
-      position: relative;
+      border: none;
+      cursor: pointer;
     }
     .avatar-img {
       width: 100%;
@@ -291,47 +295,50 @@
       display: block;
     }
     .avatar-fallback {
-      width: 100%;
-      height: 100%;
+      position: absolute;
+      inset: 0;
       display: flex;
       align-items: center;
       justify-content: center;
+      pointer-events: none;
     }
     .avatar-fallback svg {
-      width: calc(26 * var(--u));
-      height: calc(26 * var(--u));
+      width:  calc(24 * var(--u));
+      height: calc(24 * var(--u));
     }
+    /* Hide fallback when img loads */
+    .avatar-img:not([src=""]) ~ .avatar-fallback { display: none; }
 
-    /* ═══════════════════════════════════════
+    /* ─────────────────────────────────────────
        HERO
-       ═══════════════════════════════════════ */
+    ───────────────────────────────────────── */
     .hero {
       position: absolute;
-      left: calc(126 * var(--u));
-      top: calc(136 * var(--u));
+      left:      calc(126 * var(--u));
+      top:       calc(136 * var(--u));
       max-width: calc(560 * var(--u));
-      z-index: 5;
+      z-index: 3;
     }
 
+    /* Chip */
     .chip {
       display: inline-flex;
       align-items: center;
-      height: calc(36 * var(--u));
+      height:        calc(36 * var(--u));
       border-radius: calc(18 * var(--u));
       padding: 0 calc(15 * var(--u));
       background: rgba(255,255,255,.175);
       backdrop-filter: blur(calc(16 * var(--u))) saturate(115%);
       -webkit-backdrop-filter: blur(calc(16 * var(--u))) saturate(115%);
       border: 1px solid var(--glass-line);
-      font-size: calc(13.5 * var(--u));
+      font-size:   calc(13.5 * var(--u));
       font-weight: 500;
       color: rgba(255,255,255,.95);
-      letter-spacing: calc(-0.2 * var(--u));
+      letter-spacing: calc(-0.15 * var(--u));
       position: relative;
       overflow: hidden;
       animation: wipeRight .80s var(--e-out) .44s both;
     }
-
     .chip::after {
       content: '';
       position: absolute;
@@ -343,16 +350,16 @@
       pointer-events: none;
     }
 
+    /* Headline */
     .headline {
-      margin-top: calc(18 * var(--u));
-      font-family: 'Inter Tight', 'Inter', sans-serif;
-      font-weight: 500;
-      font-size: calc(63 * var(--u));
-      line-height: calc(78 * var(--u));
+      margin-top:     calc(16 * var(--u));
+      font-family:    'Inter Tight', 'Inter', sans-serif;
+      font-weight:    500;
+      font-size:      calc(63 * var(--u));
+      line-height:    calc(78 * var(--u));
       letter-spacing: calc(.25 * var(--u));
       color: #ffffff;
     }
-
     .ln {
       display: block;
       overflow: hidden;
@@ -360,63 +367,55 @@
     .ln span {
       display: block;
     }
-    .ln-1 span {
-      animation: lineUp 1.05s var(--e-out) .56s both;
-    }
-    .ln-2 span {
-      animation: lineUp 1.05s var(--e-out) .67s both;
-    }
+    .ln-1 span { animation: lineUp 1.05s var(--e-out) .56s both; }
+    .ln-2 span { animation: lineUp 1.05s var(--e-out) .67s both; }
 
+    /* Blurb */
     .blurb {
-      margin-top: calc(18 * var(--u));
-      width: calc(480 * var(--u));
-      font-size: calc(15.2 * var(--u));
-      line-height: calc(24 * var(--u));
-      font-weight: 500;
+      margin-top: calc(20 * var(--u));
+      width:        calc(480 * var(--u));
+      font-size:    calc(15.2 * var(--u));
+      line-height:  calc(24 * var(--u));
+      font-weight:  500;
       letter-spacing: calc(-0.3 * var(--u));
       color: rgba(255,255,255,.95);
       animation: wipeDown .90s var(--e-soft) .90s both;
     }
 
-    /* ═══════════════════════════════════════
-       FORECAST STRIP (BOTTOM LEFT)
-       ═══════════════════════════════════════ */
+    /* ─────────────────────────────────────────
+       FORECAST STRIP
+    ───────────────────────────────────────── */
     .forecast {
       position: absolute;
-      left: calc(126 * var(--u));
-      right: calc(396 * var(--u));
-      bottom: calc(99 * var(--u));
-      z-index: 5;
+      left:   calc(126 * var(--u));
+      right:  calc(396 * var(--u));
+      bottom: calc(99  * var(--u));
+      z-index: 3;
     }
 
+    /* Temps row */
     .temps-row {
       display: flex;
-      justify-content: space-between;
       align-items: flex-end;
-      padding-right: calc(8 * var(--u));
+      justify-content: space-between;
     }
 
     .temp-item {
       display: flex;
       align-items: center;
-      gap: calc(14 * var(--u));
+      gap: calc(9 * var(--u));
     }
-
     .t-val {
-      font-size: calc(37 * var(--u));
-      font-weight: 400;
+      font-size:      calc(37 * var(--u));
+      font-weight:    400;
       letter-spacing: calc(-0.7 * var(--u));
       color: #ffffff;
       line-height: 1;
     }
-
     .t-icon {
-      width: calc(26 * var(--u));
-      height: calc(26 * var(--u));
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #ffffff;
+      width:  calc(22 * var(--u));
+      height: calc(22 * var(--u));
+      color: rgba(255,255,255,.90);
     }
     .t-icon svg {
       width: 100%;
@@ -424,29 +423,32 @@
       fill: none;
       stroke: currentColor;
       stroke-width: 1.7;
+      stroke-linecap: round;
+      stroke-linejoin: round;
     }
 
-    .t-item-1 { animation: riseIn .60s var(--e-out) 1.26s both; }
-    .t-item-2 { animation: riseIn .60s var(--e-out) 1.33s both; }
-    .t-item-3 { animation: riseIn .60s var(--e-out) 1.40s both; }
-    .t-item-4 { animation: riseIn .60s var(--e-out) 1.47s both; }
-    .t-item-5 { animation: riseIn .60s var(--e-out) 1.54s both; }
-    .t-item-6 { animation: riseIn .60s var(--e-out) 1.61s both; }
+    .t-item-1 { animation: riseIn .60s var(--e-out) 1.260s both; }
+    .t-item-2 { animation: riseIn .60s var(--e-out) 1.330s both; }
+    .t-item-3 { animation: riseIn .60s var(--e-out) 1.400s both; }
+    .t-item-4 { animation: riseIn .60s var(--e-out) 1.470s both; }
+    .t-item-5 { animation: riseIn .60s var(--e-out) 1.540s both; }
+    .t-item-6 { animation: riseIn .60s var(--e-out) 1.610s both; }
 
-    .chart-container {
+    /* Wave chart */
+    .chart-wrap {
       width: 100%;
       height: calc(230 * var(--u));
       margin-top: calc(43 * var(--u));
       position: relative;
     }
-
     .chart-svg {
+      position: absolute;
+      inset: 0;
       width: 100%;
       height: 100%;
-      display: block;
-      overflow: visible;
     }
 
+    /* Stroke paths draw animation */
     .wline {
       fill: none;
       stroke-linecap: round;
@@ -456,22 +458,22 @@
       animation: drawLine 1.60s var(--e-pen) 1.50s both;
     }
 
+    /* Fill clip rect wipe */
     .wfill-rect {
-      transform-origin: left center;
+      transform-origin: 0 50%;
       animation: wipeX 1.42s var(--e-pen) 1.72s both;
     }
 
+    /* Days row */
     .days-row {
+      margin-top: calc(-31 * var(--u));
       display: flex;
       justify-content: space-between;
-      margin-top: calc(-31 * var(--u));
-      padding-right: calc(4 * var(--u));
       position: relative;
       z-index: 2;
     }
-
     .day-col {
-      font-size: calc(18 * var(--u));
+      font-size:   calc(18 * var(--u));
       font-weight: 500;
       color: rgba(255,255,255,.88);
       letter-spacing: calc(-0.2 * var(--u));
@@ -481,31 +483,32 @@
       font-weight: 600;
     }
 
-    .day-1 { animation: riseIn .55s var(--e-out) 2.10s both; }
+    .day-1 { animation: riseIn .55s var(--e-out) 2.100s both; }
     .day-2 { animation: riseIn .55s var(--e-out) 2.155s both; }
-    .day-3 { animation: riseIn .55s var(--e-out) 2.21s both; }
+    .day-3 { animation: riseIn .55s var(--e-out) 2.210s both; }
     .day-4 { animation: riseIn .55s var(--e-out) 2.265s both; }
-    .day-5 { animation: riseIn .55s var(--e-out) 2.32s both; }
+    .day-5 { animation: riseIn .55s var(--e-out) 2.320s both; }
     .day-6 { animation: riseIn .55s var(--e-out) 2.375s both; }
 
-    /* ═══════════════════════════════════════
-       RIGHT RAIL (CARDS)
-       ═══════════════════════════════════════ */
+    /* ─────────────────────────────────────────
+       RIGHT RAIL
+    ───────────────────────────────────────── */
     .rail {
       position: absolute;
-      right: calc(38 * var(--u));
-      top: calc(134 * var(--u));
-      bottom: calc(95 * var(--u));
-      width: calc(310 * var(--u));
+      right:  calc(38  * var(--u));
+      top:    calc(134 * var(--u));
+      bottom: calc(95  * var(--u));
+      width:  calc(310 * var(--u));
       display: flex;
       flex-direction: column;
       gap: calc(20 * var(--u));
-      z-index: 10;
+      z-index: 5;
     }
 
+    /* Base card glass */
     .card {
       background: linear-gradient(180deg,
-        rgba(255,255,255,.20) 0%,
+        rgba(255,255,255,.200)  0%,
         rgba(255,255,255,.258) 24%,
         rgba(255,255,255,.252) 78%,
         rgba(255,255,255,.232) 100%);
@@ -518,310 +521,237 @@
       color: #ffffff;
     }
 
+    /* Specular sheen */
     .card::after {
       content: '';
       position: absolute;
       inset: 0;
       width: 38%;
       background: linear-gradient(100deg, transparent 0%, rgba(255,255,255,.17) 50%, transparent 100%);
-      transform: skewX(-18deg);
+      transform: skewX(-18deg) translate3d(-150%, 0, 0);
       animation: sheen 1.15s var(--e-soft) 2.55s 1 both;
       pointer-events: none;
     }
 
-    .card-a {
+    /* Card A (big) */
+    .card-big {
       border-radius: calc(26 * var(--u));
       padding: calc(22 * var(--u)) calc(24 * var(--u)) calc(20 * var(--u));
+      flex: 1;
       display: flex;
       flex-direction: column;
       animation: slideR .95s var(--e-out) .80s both;
     }
 
-    .card-b {
-      height: calc(120 * var(--u));
-      padding: calc(18 * var(--u)) calc(24 * var(--u));
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      animation: slideR .95s var(--e-out) .92s both;
-    }
-
-    .card-c {
-      height: calc(120 * var(--u));
-      padding: calc(18 * var(--u)) calc(24 * var(--u));
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      animation: slideR .95s var(--e-out) 1.03s both;
-    }
-
-    .card-d {
-      height: calc(120 * var(--u));
-      padding: calc(18 * var(--u)) calc(24 * var(--u));
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      animation: slideR .95s var(--e-out) 1.14s both;
-    }
-
-    /* Card A internal */
     .place {
       display: flex;
       align-items: center;
-      gap: calc(7 * var(--u));
-      font-size: calc(15 * var(--u));
+      gap: calc(6 * var(--u));
+      font-size:   calc(14.5 * var(--u));
       font-weight: 500;
-      color: #ffffff;
+      color: rgba(255,255,255,.92);
       animation: riseIn .65s var(--e-out) 1.04s both;
     }
     .place svg {
-      width: calc(15 * var(--u));
-      height: calc(15 * var(--u));
+      width:  calc(14 * var(--u));
+      height: calc(14 * var(--u));
+      flex-shrink: 0;
       fill: none;
       stroke: currentColor;
       stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
     }
 
     .big-temp {
-      font-size: calc(92 * var(--u));
-      font-weight: 500;
+      font-size:      calc(92 * var(--u));
+      font-weight:    500;
       letter-spacing: calc(-4.4 * var(--u));
-      line-height: .95;
-      margin-top: calc(14 * var(--u));
+      line-height:    .90;
+      margin-top:     calc(10 * var(--u));
       color: #ffffff;
       display: flex;
       align-items: flex-start;
       animation: riseIn .70s var(--e-out) 1.12s both;
     }
     .big-temp i {
-      font-style: normal;
-      font-size: calc(36 * var(--u));
-      font-weight: 500;
+      font-style:     normal;
+      font-size:      calc(36 * var(--u));
+      font-weight:    500;
       letter-spacing: calc(-1 * var(--u));
-      margin-top: calc(12 * var(--u));
-      margin-left: calc(4 * var(--u));
+      margin-top:     calc(10 * var(--u));
+      margin-left:    calc(4  * var(--u));
     }
 
     .metrics {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-top: calc(22 * var(--u));
-      padding-top: calc(18 * var(--u));
+      margin-top:    calc(18 * var(--u));
+      padding-top:   calc(14 * var(--u));
       border-top: 1px solid rgba(255,255,255,.18);
       animation: riseIn .65s var(--e-out) 1.20s both;
     }
-
-    .metric-item {
+    .metric {
       display: flex;
       align-items: center;
       gap: calc(6 * var(--u));
-      font-size: calc(13 * var(--u));
+      font-size:   calc(13 * var(--u));
       font-weight: 500;
       color: rgba(255,255,255,.95);
       letter-spacing: calc(-0.2 * var(--u));
     }
-    .metric-item svg {
-      width: calc(16 * var(--u));
-      height: calc(16 * var(--u));
+    .metric svg {
+      width:  calc(15 * var(--u));
+      height: calc(15 * var(--u));
+      flex-shrink: 0;
       fill: none;
       stroke: currentColor;
       stroke-width: 1.8;
+      stroke-linecap: round;
+      stroke-linejoin: round;
     }
 
-    /* Small row cards */
+    /* Row cards B, C, D */
+    .card-row {
+      height: calc(120 * var(--u));
+      padding: calc(18 * var(--u)) calc(22 * var(--u));
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .card-b { animation: slideR .95s var(--e-out) .92s both; }
+    .card-c { animation: slideR .95s var(--e-out) 1.03s both; }
+    .card-d { animation: slideR .95s var(--e-out) 1.14s both; }
+
     .row-info {
       display: flex;
       flex-direction: column;
       gap: calc(2 * var(--u));
     }
     .row-country {
-      font-size: calc(12 * var(--u));
+      font-size:   calc(12 * var(--u));
       font-weight: 400;
-      color: rgba(255,255,255,.75);
-      letter-spacing: calc(-0.2 * var(--u));
+      color: rgba(255,255,255,.72);
+      letter-spacing: calc(-0.1 * var(--u));
     }
     .row-city {
-      font-size: calc(17 * var(--u));
-      font-weight: 600;
+      font-size:      calc(16.5 * var(--u));
+      font-weight:    600;
       color: #ffffff;
       letter-spacing: calc(-0.3 * var(--u));
     }
     .row-status {
-      font-size: calc(12.5 * var(--u));
+      font-size:   calc(12.5 * var(--u));
       font-weight: 400;
       color: rgba(255,255,255,.85);
-      margin-top: calc(3 * var(--u));
+      margin-top: calc(1 * var(--u));
     }
 
     .row-right {
       display: flex;
       align-items: center;
-      gap: calc(14 * var(--u));
+      gap: calc(12 * var(--u));
     }
     .row-temp {
-      font-size: calc(34 * var(--u));
+      font-size:   calc(33 * var(--u));
       font-weight: 400;
-      letter-spacing: calc(-0.8 * var(--u));
       color: #ffffff;
+      letter-spacing: calc(-0.8 * var(--u));
     }
     .row-icon {
-      width: calc(30 * var(--u));
-      height: calc(30 * var(--u));
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #ffffff;
+      width:  calc(28 * var(--u));
+      height: calc(28 * var(--u));
+      color: rgba(255,255,255,.88);
     }
     .row-icon svg {
       width: 100%;
       height: 100%;
       fill: none;
       stroke: currentColor;
-      stroke-width: 1.7;
+      stroke-width: 1.6;
+      stroke-linecap: round;
+      stroke-linejoin: round;
     }
 
-    /* ═══════════════════════════════════════
-       ANIMATION KEYFRAMES
-       ═══════════════════════════════════════ */
+    /* Row card children stagger */
+    .card-b .row-info   { animation: riseIn .55s var(--e-out) 1.16s both; }
+    .card-b .row-right  { animation: riseIn .55s var(--e-out) 1.22s both; }
+    .card-c .row-info   { animation: riseIn .55s var(--e-out) 1.26s both; }
+    .card-c .row-right  { animation: riseIn .55s var(--e-out) 1.32s both; }
+    .card-d .row-info   { animation: riseIn .55s var(--e-out) 1.32s both; }
+    .card-d .row-right  { animation: riseIn .55s var(--e-out) 1.38s both; }
+
+    /* ─────────────────────────────────────────
+       KEYFRAMES
+    ───────────────────────────────────────── */
     @keyframes riseIn {
-      from {
-        opacity: 0;
-        transform: translateY(var(--ry, 14px));
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+      from { opacity: 0; transform: translateY(var(--ry, 14px)); }
+      to   { opacity: 1; transform: translateY(0); }
     }
-
     @keyframes slideL {
-      from {
-        opacity: 0;
-        transform: translate3d(-26px, 0, 0);
-      }
-      to {
-        opacity: 1;
-        transform: translate3d(0, 0, 0);
-      }
+      from { opacity: 0; transform: translate3d(-26px, 0, 0); }
+      to   { opacity: 1; transform: translate3d(0, 0, 0); }
     }
-
     @keyframes slideR {
-      from {
-        opacity: 0;
-        transform: translate3d(30px, 0, 0) scale(.985);
-      }
-      to {
-        opacity: 1;
-        transform: translate3d(0, 0, 0) scale(1);
-      }
+      from { opacity: 0; transform: translate3d(30px, 0, 0) scale(.985); }
+      to   { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
     }
-
     @keyframes popIn {
-      from {
-        opacity: 0;
-        transform: scale(.7);
-      }
-      to {
-        opacity: 1;
-        transform: scale(1);
-      }
+      from { opacity: 0; transform: scale(.7); }
+      to   { opacity: 1; transform: scale(1); }
     }
-
     @keyframes growY {
-      from {
-        transform: scaleY(0);
-      }
-      to {
-        transform: scaleY(1);
-      }
+      from { transform: scaleY(0); }
+      to   { transform: scaleY(1); }
     }
-
     @keyframes lineUp {
-      from {
-        transform: translateY(115%);
-      }
-      to {
-        transform: translateY(0);
-      }
+      from { transform: translateY(115%); }
+      to   { transform: translateY(0); }
     }
-
     @keyframes wipeDown {
-      from {
-        clip-path: inset(0 0 100% 0);
-      }
-      to {
-        clip-path: inset(0 0 0 0);
-      }
+      from { clip-path: inset(0 0 100% 0); }
+      to   { clip-path: inset(0 0 0% 0); }
     }
-
     @keyframes wipeRight {
-      from {
-        clip-path: inset(0 100% 0 0);
-      }
-      to {
-        clip-path: inset(0 0 0 0);
-      }
+      from { clip-path: inset(0 100% 0 0); }
+      to   { clip-path: inset(0 0% 0 0); }
     }
-
-    @keyframes drawLine {
-      from {
-        stroke-dashoffset: 1;
-      }
-      to {
-        stroke-dashoffset: 0;
-      }
-    }
-
-    @keyframes wipeX {
-      from {
-        transform: scaleX(0);
-      }
-      to {
-        transform: scaleX(1);
-      }
-    }
-
     @keyframes sheen {
-      from {
-        transform: translate3d(-150%, 0, 0) skewX(-18deg);
-      }
-      to {
-        transform: translate3d(260%, 0, 0) skewX(-18deg);
-      }
+      from { transform: translate3d(-150%, 0, 0) skewX(-18deg); }
+      to   { transform: translate3d(260%, 0, 0) skewX(-18deg); }
+    }
+    @keyframes drawLine {
+      from { stroke-dashoffset: 1; }
+      to   { stroke-dashoffset: 0; }
+    }
+    @keyframes wipeX {
+      from { transform: scaleX(0); }
+      to   { transform: scaleX(1); }
     }
 
-    /* ═══════════════════════════════════════
-       ACCESSIBILITY / REDUCED MOTION
-       ═══════════════════════════════════════ */
+    /* ─────────────────────────────────────────
+       ACCESSIBILITY: REDUCED MOTION
+    ───────────────────────────────────────── */
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after {
         animation-duration: 0.01ms !important;
+        animation-delay: 0ms !important;
         animation-iteration-count: 1 !important;
         transition-duration: 0.01ms !important;
-        animation-delay: 0ms !important;
       }
-      .chip::after, .card::after {
-        display: none !important;
-      }
-      .wline {
-        stroke-dashoffset: 0 !important;
-      }
-      .wfill-rect {
-        transform: scaleX(1) !important;
-      }
-      .active-pip {
-        transform: scaleY(1) !important;
-      }
+      .chip::after,
+      .card::after { display: none !important; }
+      .sidebar-pip { transform: scaleY(1) !important; }
+      .wline { stroke-dashoffset: 0 !important; }
+      .wfill-rect { transform: scaleX(1) !important; }
     }
 
-    /* ═══════════════════════════════════════
-       MOBILE & RESPONSIVE REFLOW (≤ 860px)
-       ═══════════════════════════════════════ */
+    /* ─────────────────────────────────────────
+       MOBILE ≤ 860px
+    ───────────────────────────────────────── */
     @media (max-width: 860px) {
-      :root {
-        --u: min(100vw / 430, 1.22px);
-      }
+      :root { --u: min(100vw / 430, 1.22px); }
 
       html, body {
         overflow-y: auto !important;
@@ -832,413 +762,527 @@
         position: relative;
         min-height: 100vh;
         overflow: visible;
-        padding-bottom: calc(90 * var(--u));
+        padding-bottom: calc(80 * var(--u));
       }
+      .stage::after { display: none; }
+      .stage-content { position: relative; inset: auto; }
 
+      /* Bottom dock sidebar */
       .sidebar {
         position: fixed;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        top: auto;
+        left: 0; right: 0; bottom: 0; top: auto;
         width: 100%;
         height: calc(64 * var(--u));
         border-radius: calc(20 * var(--u)) calc(20 * var(--u)) 0 0;
         flex-direction: row;
-        padding: 0 calc(24 * var(--u));
-        border-bottom: none;
-        border-left: none;
-        border-right: none;
-        animation: riseIn .6s var(--e-out) .1s both;
-      }
-      .active-pip {
-        display: none;
-      }
-      .logo {
-        display: none;
-      }
-      .nav {
-        margin-top: 0;
-        flex-direction: row;
-        gap: calc(28 * var(--u));
-        width: 100%;
+        align-items: center;
         justify-content: space-around;
+        padding: 0 calc(16 * var(--u));
+        z-index: 100;
+        animation: riseIn .60s var(--e-out) .05s both;
       }
-      .logout {
-        display: none;
-      }
+      .sidebar-pip { display: none; }
+      .logo { width: calc(28 * var(--u)); height: calc(28 * var(--u)); }
+      .nav { flex-direction: row; margin-top: 0; gap: calc(28 * var(--u)); }
+      .logout { margin-top: 0; }
 
+      /* Header reflow */
       .header {
         position: relative;
-        top: auto;
-        left: auto;
-        right: auto;
+        top: auto; left: auto; right: auto;
+        padding: calc(22 * var(--u)) calc(20 * var(--u)) 0;
         height: auto;
-        padding: calc(20 * var(--u)) calc(20 * var(--u)) 0;
       }
 
+      /* Hero reflow */
       .hero {
         position: relative;
-        top: auto;
-        left: auto;
-        padding: calc(24 * var(--u)) calc(20 * var(--u)) 0;
+        left: auto; top: auto;
         max-width: 100%;
+        padding: calc(24 * var(--u)) calc(20 * var(--u)) 0;
       }
-      .blurb {
-        width: 100%;
-      }
+      .blurb { width: 100%; }
 
+      /* Rail stacks below hero */
       .rail {
         position: relative;
-        right: auto;
-        top: auto;
-        bottom: auto;
+        right: auto; top: auto; bottom: auto;
         width: auto;
-        padding: calc(24 * var(--u)) calc(20 * var(--u)) 0;
-        gap: calc(14 * var(--u));
+        padding: calc(20 * var(--u)) calc(20 * var(--u)) 0;
       }
-      .card {
-        animation: riseIn .6s var(--e-out) .2s both !important;
-      }
+      .card-big { flex: none; }
 
+      /* Forecast below rail */
       .forecast {
         position: relative;
-        left: auto;
-        right: auto;
-        bottom: auto;
-        padding: calc(30 * var(--u)) calc(20 * var(--u)) calc(20 * var(--u));
+        left: auto; right: auto; bottom: auto;
+        padding: calc(24 * var(--u)) calc(20 * var(--u)) 0;
       }
+
+      /* Reset card/sidebar slide animations → riseIn */
+      .card-big, .card-b, .card-c, .card-d { animation-name: riseIn; }
     }
 
     @media (max-width: 420px) {
-      :root {
-        --u: calc(100vw / 430);
-      }
+      :root { --u: calc(100vw / 430); }
     }
   </style>
 </head>
 <body>
 
-  <!-- SVG ICON SPRITE -->
-  <svg style="display: none;" aria-hidden="true">
+  <!-- ══════════════════════════════════════════
+       ICON SPRITE (hidden)
+  ══════════════════════════════════════════ -->
+  <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"
+       style="position:absolute;width:0;height:0;overflow:hidden">
     <defs>
-      <!-- Horizontal wave opacity gradient for line stroke -->
-      <linearGradient id="wg" x1="0%" y1="0%" x2="100%" y2="0%">
-        <stop offset="0%" stop-color="#ffffff" stop-opacity="0.30"/>
-        <stop offset="25%" stop-color="#ffffff" stop-opacity="0.95"/>
-        <stop offset="65%" stop-color="#ffffff" stop-opacity="1.00"/>
-        <stop offset="100%" stop-color="#ffffff" stop-opacity="0.25"/>
-      </linearGradient>
 
-      <!-- Fill gradient -->
-      <linearGradient id="wf" x1="0%" y1="0%" x2="0%" y2="100%">
-        <stop offset="0%" stop-color="#ffffff" stop-opacity="0.38"/>
-        <stop offset="45%" stop-color="#ffffff" stop-opacity="0.16"/>
-        <stop offset="100%" stop-color="#ffffff" stop-opacity="0.00"/>
-      </linearGradient>
-
-      <!-- Vertical fade mask -->
-      <mask id="wfade" maskUnits="userSpaceOnUse" x="0" y="0" width="835" height="230">
-        <linearGradient id="mf" x1="0" y1="0" x2="0" y2="230" gradientUnits="userSpaceOnUse">
-          <stop offset="0%" stop-color="#ffffff" stop-opacity="1"/>
-          <stop offset="70%" stop-color="#ffffff" stop-opacity="0.75"/>
-          <stop offset="100%" stop-color="#000000" stop-opacity="0"/>
-        </linearGradient>
-        <rect x="0" y="0" width="835" height="230" fill="url(#mf)"/>
-      </mask>
-
-      <!-- Wipe-in clipPath -->
-      <clipPath id="wclip">
-        <rect id="wclipr" class="wfill-rect" x="0" y="0" width="835" height="230"/>
-      </clipPath>
-
-      <!-- Logo Icon -->
+      <!-- Logo: soft square + horizontal wave strokes -->
       <symbol id="i-logo" viewBox="0 0 40 40">
-        <rect x="0" y="0" width="40" height="40" rx="12" fill="rgba(255,255,255,0.18)" stroke="rgba(255,255,255,0.3)" stroke-width="1"/>
-        <g clip-path="url(#logo-clip)">
-          <circle cx="20" cy="20" r="14" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="1"/>
-          <!-- 7 wavy horizontal strokes -->
-          <path d="M4 11 Q12 9 20 11 T36 11" fill="none" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round"/>
-          <path d="M4 14 Q12 12 20 14 T36 14" fill="none" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round"/>
-          <path d="M4 17 Q12 15 20 17 T36 17" fill="none" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round"/>
-          <path d="M4 20 Q12 18 20 20 T36 20" fill="none" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round"/>
-          <path d="M4 23 Q12 21 20 23 T36 23" fill="none" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round"/>
-          <path d="M4 26 Q12 24 20 26 T36 26" fill="none" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round"/>
-          <path d="M4 29 Q12 27 20 29 T36 29" fill="none" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round"/>
+        <rect x="1" y="1" width="38" height="38" rx="12" ry="12"
+              fill="none" stroke="rgba(255,255,255,.35)" stroke-width="1.2"/>
+        <g fill="none" stroke="#ffffff" stroke-width="1.55" stroke-linecap="round">
+          <path d="M 8 13 Q 11 10.5 14 13 Q 17 15.5 20 13 Q 23 10.5 26 13 Q 29 15.5 32 13"/>
+          <path d="M 8 17.5 Q 11 15 14 17.5 Q 17 20 20 17.5 Q 23 15 26 17.5 Q 29 20 32 17.5"/>
+          <path d="M 8 22 Q 11 19.5 14 22 Q 17 24.5 20 22 Q 23 19.5 26 22 Q 29 24.5 32 22"/>
+          <path d="M 8 26.5 Q 11 24 14 26.5 Q 17 29 20 26.5 Q 23 24 26 26.5 Q 29 29 32 26.5"/>
+          <path d="M 12 31 Q 14.5 29 17 31 Q 19.5 33 22 31 Q 24.5 29 27 31"/>
+          <path d="M 14 8.5 Q 16.5 6.5 19 8.5 Q 21.5 10.5 24 8.5"/>
         </g>
-        <clipPath id="logo-clip">
-          <circle cx="20" cy="20" r="13.5"/>
-        </clipPath>
       </symbol>
 
-      <!-- Grid / Dashboard -->
+      <!-- Dashboard grid -->
       <symbol id="i-grid" viewBox="0 0 24 24">
-        <rect x="3" y="3" width="7" height="7" rx="1.5"></rect>
-        <rect x="14" y="3" width="7" height="7" rx="1.5"></rect>
-        <rect x="14" y="14" width="7" height="7" rx="1.5"></rect>
-        <rect x="3" y="14" width="7" height="7" rx="1.5"></rect>
+        <rect x="3" y="3" width="7" height="7" rx="1.5"/>
+        <rect x="14" y="3" width="7" height="7" rx="1.5"/>
+        <rect x="14" y="14" width="7" height="7" rx="1.5"/>
+        <rect x="3" y="14" width="7" height="7" rx="1.5"/>
       </symbol>
 
-      <!-- Chart / Reports -->
+      <!-- Reports / bar chart -->
       <symbol id="i-chart" viewBox="0 0 24 24">
-        <line x1="18" y1="20" x2="18" y2="10"></line>
-        <line x1="12" y1="20" x2="12" y2="4"></line>
-        <line x1="6" y1="20" x2="6" y2="14"></line>
+        <line x1="18" y1="20" x2="18" y2="10"/>
+        <line x1="12" y1="20" x2="12" y2="4"/>
+        <line x1="6"  y1="20" x2="6"  y2="14"/>
+        <line x1="2"  y1="20" x2="22" y2="20"/>
       </symbol>
 
-      <!-- Globe / Regions -->
+      <!-- Globe -->
       <symbol id="i-globe" viewBox="0 0 24 24">
-        <circle cx="12" cy="12" r="10"></circle>
-        <line x1="2" y1="12" x2="22" y2="12"></line>
-        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+        <circle cx="12" cy="12" r="10"/>
+        <line x1="2" y1="12" x2="22" y2="12"/>
+        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
       </symbol>
 
       <!-- Calendar -->
       <symbol id="i-cal" viewBox="0 0 24 24">
-        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-        <line x1="16" y1="2" x2="16" y2="6"></line>
-        <line x1="8" y1="2" x2="8" y2="6"></line>
-        <line x1="3" y1="10" x2="21" y2="10"></line>
+        <rect x="3" y="4" width="18" height="18" rx="2"/>
+        <line x1="16" y1="2" x2="16" y2="6"/>
+        <line x1="8"  y1="2" x2="8"  y2="6"/>
+        <line x1="3"  y1="10" x2="21" y2="10"/>
       </symbol>
 
-      <!-- Gear / Settings -->
+      <!-- Settings gear -->
       <symbol id="i-gear" viewBox="0 0 24 24">
-        <circle cx="12" cy="12" r="3"></circle>
-        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+        <circle cx="12" cy="12" r="3"/>
+        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
       </symbol>
 
-      <!-- Logout -->
+      <!-- Logout arrow -->
       <symbol id="i-out" viewBox="0 0 24 24">
-        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-        <polyline points="16 17 21 12 16 7"></polyline>
-        <line x1="21" y1="12" x2="9" y2="12"></line>
+        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+        <polyline points="16 17 21 12 16 7"/>
+        <line x1="21" y1="12" x2="9" y2="12"/>
       </symbol>
 
       <!-- Plus -->
       <symbol id="i-plus" viewBox="0 0 24 24">
-        <line x1="12" y1="5" x2="12" y2="19"></line>
-        <line x1="5" y1="12" x2="19" y2="12"></line>
+        <line x1="12" y1="5" x2="12" y2="19"/>
+        <line x1="5"  y1="12" x2="19" y2="12"/>
       </symbol>
 
       <!-- Search -->
       <symbol id="i-search" viewBox="0 0 24 24">
-        <circle cx="11" cy="11" r="8"></circle>
-        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        <circle cx="11" cy="11" r="8"/>
+        <line x1="21" y1="21" x2="16.65" y2="16.65"/>
       </symbol>
 
       <!-- Bell -->
       <symbol id="i-bell" viewBox="0 0 24 24">
-        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
-        <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+        <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
       </symbol>
 
       <!-- Pin -->
       <symbol id="i-pin" viewBox="0 0 24 24">
-        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-        <circle cx="12" cy="10" r="3"></circle>
+        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+        <circle cx="12" cy="10" r="3"/>
       </symbol>
 
       <!-- Wind -->
       <symbol id="i-wind" viewBox="0 0 24 24">
-        <path d="M9.59 4.59A2 2 0 1 1 11 8H2m10.59 11.41A2 2 0 1 0 14 16H2m15.73-8.27A2.5 2.5 0 1 1 19.5 12H2"></path>
+        <path d="M9.59 4.59A2 2 0 1 1 11 8H2m10.59 11.41A2 2 0 1 0 14 16H2m15.73-8.27A2.5 2.5 0 1 1 19.5 12H2"/>
       </symbol>
 
-      <!-- Drop -->
+      <!-- Water drop -->
       <symbol id="i-drop" viewBox="0 0 24 24">
-        <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path>
+        <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/>
       </symbol>
 
-      <!-- Gust -->
+      <!-- Compass / gust -->
       <symbol id="i-gust" viewBox="0 0 24 24">
-        <circle cx="12" cy="12" r="9"></circle>
-        <path d="M12 3v3m0 12v3M3 12h3m12 0h3"></path>
-        <polyline points="12 12 16 8"></polyline>
+        <circle cx="12" cy="12" r="9"/>
+        <path d="M12 3v3M12 18v3M3 12h3M18 12h3"/>
+        <polyline points="12 12 16 8"/>
       </symbol>
 
-      <!-- Cloud -->
+      <!-- Cloud (filled style, overcast) -->
       <symbol id="i-cloud" viewBox="0 0 24 24">
-        <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"></path>
+        <path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9z"/>
       </symbol>
 
-      <!-- Cloud2 (Partly Cloudy / Sun + Cloud) -->
+      <!-- Cloud + sun rays (partly cloudy) -->
       <symbol id="i-cloud2" viewBox="0 0 24 24">
-        <path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32l1.41 1.41M2 12h2m16 0h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41" opacity="0.65"></path>
-        <path d="M20 16.58A5 5 0 0 0 18 7h-1.26A8 8 0 1 0 4 15.25"></path>
-        <path d="M7 19h11a4 4 0 0 0 0-8h-1"></path>
+        <path d="M12 4V2m0 20v-2M4 12H2m20 0h-2m-3.64-6.36 1.41-1.41M6.34 17.66l-1.41 1.41M17.66 17.66l1.41 1.41M6.34 6.34 4.93 4.93" opacity=".55"/>
+        <path d="M16 19H9a5 5 0 1 1 4.9-6h1.1a3.5 3.5 0 1 1 0 7z"/>
       </symbol>
 
-      <!-- Hail / Rain Shower -->
+      <!-- Cloud + rain drops (hail/shower) -->
       <symbol id="i-hail" viewBox="0 0 24 24">
-        <path d="M20 16.58A5 5 0 0 0 18 7h-1.26A8 8 0 1 0 4 15.25"></path>
-        <path d="M8 19v2m4-3v2m4-1v2" stroke-linecap="round"></path>
+        <path d="M17.5 17H9a6 6 0 1 1 5.75-7.75A4 4 0 1 1 17.5 17z"/>
+        <path d="M8 20v2M12 20v2M16 20v2" stroke-linecap="round"/>
       </symbol>
 
       <!-- Sun -->
       <symbol id="i-sun" viewBox="0 0 24 24">
-        <circle cx="12" cy="12" r="5"></circle>
-        <line x1="12" y1="1" x2="12" y2="3"></line>
-        <line x1="12" y1="21" x2="12" y2="23"></line>
-        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
-        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
-        <line x1="1" y1="12" x2="3" y2="12"></line>
-        <line x1="21" y1="12" x2="23" y2="12"></line>
-        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
-        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+        <circle cx="12" cy="12" r="4"/>
+        <line x1="12" y1="2"    x2="12" y2="4"/>
+        <line x1="12" y1="20"   x2="12" y2="22"/>
+        <line x1="4.93" y1="4.93"  x2="6.34"  y2="6.34"/>
+        <line x1="17.66" y1="17.66" x2="19.07" y2="19.07"/>
+        <line x1="2"  y1="12" x2="4"  y2="12"/>
+        <line x1="20" y1="12" x2="22" y2="12"/>
+        <line x1="4.93"  y1="19.07" x2="6.34"  y2="17.66"/>
+        <line x1="17.66" y1="6.34"  x2="19.07" y2="4.93"/>
       </symbol>
 
-      <!-- Avatar Vector Fallback -->
+      <!-- Avatar fallback portrait -->
       <symbol id="i-avatar" viewBox="0 0 24 24">
-        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-        <circle cx="12" cy="7" r="4"></circle>
+        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+        <circle cx="12" cy="7" r="4"/>
       </symbol>
+
     </defs>
   </svg>
 
-  <div class="stage">
+  <!-- ══════════════════════════════════════════
+       STAGE
+  ══════════════════════════════════════════ -->
+  <div class="stage" role="main">
+
+    <!-- Atmospheric SVG overlay (lightning pylons + green hills) rendered over the storm bg photo -->
+    <svg class="stage-atm" viewBox="0 0 1357 871" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+      <defs>
+        <radialGradient id="lg1" cx="510" cy="380" r="310" gradientUnits="userSpaceOnUse">
+          <stop offset="0%"   stop-color="#67e8f9" stop-opacity=".20"/>
+          <stop offset="45%"  stop-color="#0284c7" stop-opacity=".07"/>
+          <stop offset="100%" stop-color="#0284c7" stop-opacity="0"/>
+        </radialGradient>
+        <radialGradient id="lg2" cx="650" cy="410" r="330" gradientUnits="userSpaceOnUse">
+          <stop offset="0%"   stop-color="#67e8f9" stop-opacity=".22"/>
+          <stop offset="45%"  stop-color="#0284c7" stop-opacity=".07"/>
+          <stop offset="100%" stop-color="#0284c7" stop-opacity="0"/>
+        </radialGradient>
+      </defs>
+      <!-- Soft glow pools behind pylons -->
+      <ellipse cx="510" cy="430" rx="300" ry="380" fill="url(#lg1)"/>
+      <ellipse cx="650" cy="430" rx="320" ry="360" fill="url(#lg2)"/>
+      <!-- Lightning pylon 1 (behind Tuesday / 14°) -->
+      <g opacity=".80" stroke-linecap="round">
+        <polyline points="515,70  510,130 522,188 504,250 519,318 498,385 515,462 494,535 511,615 490,695 516,752 547,802"
+                  fill="none" stroke="#e0f2fe" stroke-width="2.6"/>
+        <polyline points="510,70  519,142 507,214 526,294 504,372 523,452 499,543 520,635 494,714 531,782"
+                  fill="none" stroke="#7dd3fc" stroke-width="1.3"/>
+        <polyline points="519,188 498,234 514,282 487,342 516,413 479,484 511,562 474,644 511,732 469,802"
+                  fill="none" stroke="#38bdf8" stroke-width="1.0" opacity=".70"/>
+        <polyline points="504,250 532,302 514,362 541,432 519,503 547,582 511,664 541,742"
+                  fill="none" stroke="#bae6fd" stroke-width="1.1"/>
+        <!-- Cross-connections -->
+        <polyline points="498,234 519,250 531,302 513,282 498,385 541,432 515,462 479,484 519,503 511,615 547,582 474,644 511,664 490,695 541,742 516,752 469,802 547,802"
+                  fill="none" stroke="#38bdf8" stroke-width=".7" opacity=".55"/>
+      </g>
+      <!-- Lightning pylon 2 (behind Wednesday / 10°) -->
+      <g opacity=".85" stroke-linecap="round">
+        <polyline points="644,118 650,192 636,272 653,354 634,434 652,514 629,594 648,674 624,743 641,797"
+                  fill="none" stroke="#f0f9ff" stroke-width="3.0"/>
+        <polyline points="639,118 658,202 641,292 661,382 639,472 663,562 637,652 661,732 644,797"
+                  fill="none" stroke="#7dd3fc" stroke-width="1.4"/>
+        <polyline points="650,192 629,253 648,323 621,402 651,492 619,572 648,662 614,732 644,797"
+                  fill="none" stroke="#38bdf8" stroke-width="1.1" opacity=".74"/>
+        <polyline points="653,354 672,424 647,492 676,572 648,662 681,742 722,782"
+                  fill="none" stroke="#bae6fd" stroke-width="1.2"/>
+        <polyline points="629,253 653,354 641,292 621,402 672,424 652,514 619,572 647,492 676,572 629,594 663,562 648,662 681,742 624,743 661,732 722,782 641,797"
+                  fill="none" stroke="#38bdf8" stroke-width=".75" opacity=".60"/>
+      </g>
+      <!-- Rolling green field at bottom -->
+      <path d="M0,871 L0,792 Q340,760 680,806 T1357,782 L1357,871 Z" fill="#0a221a"/>
+      <path d="M0,871 L0,812 Q420,784 852,822 T1357,802 L1357,871 Z" fill="#06180f"/>
+    </svg>
+
     <div class="stage-content">
 
-      <!-- 1) LEFT SIDEBAR -->
-      <aside class="sidebar" aria-label="Main Navigation">
-        <div class="active-pip" aria-hidden="true"></div>
-        <div class="logo">
-          <svg><use href="#i-logo"></use></svg>
+      <!-- ── 1) SIDEBAR ── -->
+      <aside class="sidebar" aria-label="Main navigation">
+        <div class="sidebar-pip" aria-hidden="true"></div>
+
+        <div class="logo" aria-label="Aurora Weather">
+          <svg aria-hidden="true"><use href="#i-logo"/></svg>
         </div>
-        <nav class="nav">
+
+        <nav class="nav" aria-label="Primary">
           <a href="#" class="nav-link nav-item-1" aria-label="Dashboard" aria-current="page">
-            <svg><use href="#i-grid"></use></svg>
+            <svg aria-hidden="true"><use href="#i-grid"/></svg>
           </a>
           <a href="#" class="nav-link nav-item-2" aria-label="Reports">
-            <svg><use href="#i-chart"></use></svg>
+            <svg aria-hidden="true"><use href="#i-chart"/></svg>
           </a>
           <a href="#" class="nav-link nav-item-3" aria-label="Explore regions">
-            <svg><use href="#i-globe"></use></svg>
+            <svg aria-hidden="true"><use href="#i-globe"/></svg>
           </a>
           <a href="#" class="nav-link nav-item-4" aria-label="Calendar">
-            <svg><use href="#i-cal"></use></svg>
+            <svg aria-hidden="true"><use href="#i-cal"/></svg>
           </a>
           <a href="#" class="nav-link nav-item-5" aria-label="Settings">
-            <svg><use href="#i-gear"></use></svg>
+            <svg aria-hidden="true"><use href="#i-gear"/></svg>
           </a>
         </nav>
+
         <a href="#" class="logout" aria-label="Sign out">
-          <svg><use href="#i-out"></use></svg>
+          <svg aria-hidden="true"><use href="#i-out"/></svg>
         </a>
       </aside>
 
-      <!-- 2) HEADER -->
+      <!-- ── 2) HEADER ── -->
       <header class="header">
         <div class="greeting">
-          <span class="hello">Welcome</span>
-          <span class="who">Calfin Danang</span>
+          <span class="greeting-hello">Welcome</span>
+          <span class="greeting-who">Calfin Danang</span>
         </div>
-        <div class="tools">
-          <button class="tool tool-1" aria-label="Add location" type="button">
-            <svg><use href="#i-plus"></use></svg>
+        <div class="tools" role="toolbar" aria-label="Actions">
+          <button class="tool tool-1" type="button" aria-label="Add location">
+            <svg aria-hidden="true"><use href="#i-plus"/></svg>
           </button>
-          <button class="tool tool-2" aria-label="Search" type="button">
-            <svg><use href="#i-search"></use></svg>
+          <button class="tool tool-2" type="button" aria-label="Search">
+            <svg aria-hidden="true"><use href="#i-search"/></svg>
           </button>
-          <button class="tool tool-3" aria-label="Notifications" type="button">
-            <svg><use href="#i-bell"></use></svg>
+          <button class="tool tool-3" type="button" aria-label="Notifications">
+            <svg aria-hidden="true"><use href="#i-bell"/></svg>
           </button>
-          <button class="tool tool-4 avatar-btn" aria-label="User Profile" type="button">
-            <img class="avatar-img" src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=160&h=160&fit=crop&crop=faces&q=80&auto=format" alt="Calfin Danang" loading="eager" decoding="async" onerror="this.remove()">
-            <div class="avatar-fallback" aria-hidden="true">
-              <svg><use href="#i-avatar"></use></svg>
-            </div>
+          <button class="tool tool-4 avatar-btn" type="button" aria-label="User profile: Calfin Danang">
+            <img class="avatar-img"
+                 src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=160&h=160&fit=crop&crop=faces&q=80&auto=format"
+                 alt="Calfin Danang"
+                 loading="eager" decoding="async"
+                 onerror="this.style.display='none'">
+            <span class="avatar-fallback" aria-hidden="true">
+              <svg><use href="#i-avatar"/></svg>
+            </span>
           </button>
         </div>
       </header>
 
-      <!-- 3) HERO -->
-      <section class="hero">
-        <div class="chip">Weather Forecast</div>
-        <h1 class="headline">
+      <!-- ── 3) HERO ── -->
+      <section class="hero" aria-labelledby="hero-headline">
+        <div class="chip" role="note">Weather Forecast</div>
+        <h1 class="headline" id="hero-headline">
           <span class="ln ln-1"><span>Strom</span></span>
           <span class="ln ln-2"><span>with Heavy Rain</span></span>
         </h1>
-        <p class="blurb">Partly cloudy with occasional snow showers. High around 50°F. Wind from the east 11 to 21 mph. Snow chance is 40%, with rainfall expected to be less than an inch.</p>
+        <p class="blurb">
+          Partly cloudy with occasional snow showers. High around 50°F.
+          Wind from the east 11 to 21 mph. Snow chance is 40%, with
+          rainfall expected to be less than an inch.
+        </p>
       </section>
 
-      <!-- 4) FORECAST STRIP -->
-      <section class="forecast">
-        <div class="temps-row">
-          <div class="temp-item t-item-1">
+      <!-- ── 4) FORECAST STRIP ── -->
+      <section class="forecast" aria-label="7-day forecast">
+        <!-- Hourly temps -->
+        <div class="temps-row" role="list" aria-label="Temperature by day">
+          <div class="temp-item t-item-1" role="listitem">
             <span class="t-val">11°</span>
-            <div class="t-icon"><svg><use href="#i-cloud"></use></svg></div>
+            <span class="t-icon" aria-hidden="true"><svg><use href="#i-cloud"/></svg></span>
           </div>
-          <div class="temp-item t-item-2">
+          <div class="temp-item t-item-2" role="listitem">
             <span class="t-val">13°</span>
-            <div class="t-icon"><svg><use href="#i-cloud2"></use></svg></div>
+            <span class="t-icon" aria-hidden="true"><svg><use href="#i-cloud2"/></svg></span>
           </div>
-          <div class="temp-item t-item-3">
+          <div class="temp-item t-item-3" role="listitem">
             <span class="t-val">14°</span>
-            <div class="t-icon"><svg><use href="#i-cloud2"></use></svg></div>
+            <span class="t-icon" aria-hidden="true"><svg><use href="#i-cloud2"/></svg></span>
           </div>
-          <div class="temp-item t-item-4">
+          <div class="temp-item t-item-4" role="listitem">
             <span class="t-val">10°</span>
-            <div class="t-icon"><svg><use href="#i-hail"></use></svg></div>
+            <span class="t-icon" aria-hidden="true"><svg><use href="#i-hail"/></svg></span>
           </div>
-          <div class="temp-item t-item-5">
+          <div class="temp-item t-item-5" role="listitem">
             <span class="t-val">19°</span>
-            <div class="t-icon"><svg><use href="#i-sun"></use></svg></div>
+            <span class="t-icon" aria-hidden="true"><svg><use href="#i-sun"/></svg></span>
           </div>
-          <div class="temp-item t-item-6">
+          <div class="temp-item t-item-6" role="listitem">
             <span class="t-val">12°</span>
-            <div class="t-icon"><svg><use href="#i-cloud"></use></svg></div>
+            <span class="t-icon" aria-hidden="true"><svg><use href="#i-cloud"/></svg></span>
           </div>
         </div>
 
-        <div class="chart-container">
+        <!-- ── Wave Chart ── -->
+        <!--
+          Temp values: 11 13 14 10 19 12
+          Canvas: 835 × 230 (viewBox).  6 columns, centres at x: ~0, 139, 278, 417, 556, 695, 835
+          Y scale: min=10°→y218, max=19°→y12  (range 9°, span 206px)
+          formula: y = 218 - (t-10)/9 * 206
+            11→195  13→172  14→160  10→218  19→12  12→183
+          Anchor x centres (with 70px inset each side): 70, 209, 348, 487, 626, 765
+        -->
+        <div class="chart-wrap" aria-hidden="true">
           <svg class="chart-svg" viewBox="0 0 835 230" preserveAspectRatio="none">
-            <!-- Shaded fill under wave with vertical gradient & mask -->
-            <path d="M0,79 C65,79 95,12 152,12 C209,12 245,68 300,68 C355,68 395,24 452,24 C509,24 545,95 605,95 C665,95 700,5 756,5 C800,5 820,86 835,86 L835,230 L0,230 Z" fill="url(#wf)" mask="url(#wfade)" clip-path="url(#wclip)"/>
-            <!-- 3 stroked outline paths with glow & opacity steps -->
-            <path class="wline" pathLength="1" d="M0,79 C65,79 95,12 152,12 C209,12 245,68 300,68 C355,68 395,24 452,24 C509,24 545,95 605,95 C665,95 700,5 756,5 C800,5 820,86 835,86" stroke="url(#wg)" stroke-width="6.2" opacity="0.17"/>
-            <path class="wline" pathLength="1" d="M0,79 C65,79 95,12 152,12 C209,12 245,68 300,68 C355,68 395,24 452,24 C509,24 545,95 605,95 C665,95 700,5 756,5 C800,5 820,86 835,86" stroke="url(#wg)" stroke-width="4.6" opacity="0.26"/>
-            <path class="wline" pathLength="1" d="M0,79 C65,79 95,12 152,12 C209,12 245,68 300,68 C355,68 395,24 452,24 C509,24 545,95 605,95 C665,95 700,5 756,5 C800,5 820,86 835,86" stroke="url(#wg)" stroke-width="3.4" opacity="1.00"/>
+            <defs>
+              <!-- Horizontal opacity fade mask (dissolve edges) -->
+              <linearGradient id="wg" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0"    stop-color="#fff" stop-opacity="0"/>
+                <stop offset=".05"  stop-color="#fff" stop-opacity="1"/>
+                <stop offset=".95"  stop-color="#fff" stop-opacity="1"/>
+                <stop offset="1"    stop-color="#fff" stop-opacity="0"/>
+              </linearGradient>
+              <!-- Vertical fill gradient teal → transparent -->
+              <linearGradient id="wf" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0"    stop-color="#67e8f9" stop-opacity=".30"/>
+                <stop offset=".50"  stop-color="#0ea5e9" stop-opacity=".10"/>
+                <stop offset="1"    stop-color="#0369a1" stop-opacity="0"/>
+              </linearGradient>
+              <!-- Mask for edge fade -->
+              <mask id="wfade">
+                <rect width="835" height="230" fill="url(#wg)"/>
+              </mask>
+              <!-- Clip rect for wipe-reveal of the fill area -->
+              <clipPath id="wclip">
+                <rect id="wclipr" class="wfill-rect" x="0" y="0" width="835" height="230"/>
+              </clipPath>
+            </defs>
+
+            <!--
+              The cubic bezier path through:
+                (70,195) → (209,172) → (348,160) → (487,218) → (626,12) → (765,183)
+              Extended out to x=0 left and x=835 right
+            -->
+
+            <!-- Fill area — wipe revealed left→right via clipPath -->
+            <path
+              d="M 0,195
+                 C 35,195 50,195 70,195
+                 C 120,195 159,172 209,172
+                 C 259,172 298,160 348,160
+                 C 398,160 437,218 487,218
+                 C 537,218 576,12 626,12
+                 C 676,12 715,183 765,183
+                 C 795,183 820,183 835,183
+                 L 835,230 L 0,230 Z"
+              fill="url(#wf)"
+              mask="url(#wfade)"
+              clip-path="url(#wclip)"
+            />
+
+            <!-- Thick glow line (stroke 6.2 @opacity .17) -->
+            <path class="wline"
+              d="M 0,195
+                 C 35,195 50,195 70,195
+                 C 120,195 159,172 209,172
+                 C 259,172 298,160 348,160
+                 C 398,160 437,218 487,218
+                 C 537,218 576,12 626,12
+                 C 676,12 715,183 765,183
+                 C 795,183 820,183 835,183"
+              stroke="rgba(255,255,255,.17)"
+              stroke-width="6.2"
+              pathLength="1"
+            />
+
+            <!-- Medium line (4.6 @.26) -->
+            <path class="wline"
+              d="M 0,195
+                 C 35,195 50,195 70,195
+                 C 120,195 159,172 209,172
+                 C 259,172 298,160 348,160
+                 C 398,160 437,218 487,218
+                 C 537,218 576,12 626,12
+                 C 676,12 715,183 765,183
+                 C 795,183 820,183 835,183"
+              stroke="rgba(125,211,252,.26)"
+              stroke-width="4.6"
+              pathLength="1"
+              style="animation-delay: 1.52s"
+            />
+
+            <!-- Thin crisp line (3.4 @1.0 full opacity) with horizontal gradient mask -->
+            <path class="wline"
+              d="M 0,195
+                 C 35,195 50,195 70,195
+                 C 120,195 159,172 209,172
+                 C 259,172 298,160 348,160
+                 C 398,160 437,218 487,218
+                 C 537,218 576,12 626,12
+                 C 676,12 715,183 765,183
+                 C 795,183 820,183 835,183"
+              stroke="rgba(125,211,252,1.0)"
+              stroke-width="3.4"
+              pathLength="1"
+              mask="url(#wfade)"
+              style="animation-delay: 1.50s"
+            />
           </svg>
         </div>
 
-        <div class="days-row">
-          <span class="day-col day-1">Sunday</span>
-          <span class="day-col day-2">Monday</span>
-          <span class="day-col day-3">Tuesday</span>
-          <span class="day-col day-4 on">Wednesday</span>
-          <span class="day-col day-5">Thursday</span>
-          <span class="day-col day-6">Friday</span>
+        <!-- Day labels -->
+        <div class="days-row" role="list" aria-label="Days of the week">
+          <span class="day-col day-1" role="listitem">Sunday</span>
+          <span class="day-col day-2" role="listitem">Monday</span>
+          <span class="day-col day-3" role="listitem">Tuesday</span>
+          <span class="day-col day-4 on" role="listitem" aria-current="date">Wednesday</span>
+          <span class="day-col day-5" role="listitem">Thursday</span>
+          <span class="day-col day-6" role="listitem">Friday</span>
         </div>
       </section>
 
-      <!-- 5) RIGHT RAIL -->
-      <aside class="rail">
-        <!-- Card A (Big) -->
-        <div class="card card-a">
+      <!-- ── 5) RIGHT RAIL ── -->
+      <aside class="rail" aria-label="Other locations">
+
+        <!-- Card A: Central Jakarta (big) -->
+        <div class="card card-big" aria-label="Central Jakarta: 10 degrees Celsius">
           <div class="place">
-            <svg><use href="#i-pin"></use></svg>
+            <svg aria-hidden="true"><use href="#i-pin"/></svg>
             <span>Central Jakarta</span>
           </div>
-          <div class="big-temp">
+          <div class="big-temp" aria-label="10 degrees">
             10° <i>C</i>
           </div>
-          <div class="metrics">
-            <div class="metric-item">
-              <svg><use href="#i-wind"></use></svg>
-              <span>19 mph</span>
+          <dl class="metrics">
+            <div class="metric">
+              <svg aria-hidden="true"><use href="#i-wind"/></svg>
+              <dd>19 mph</dd>
             </div>
-            <div class="metric-item">
-              <svg><use href="#i-drop"></use></svg>
-              <span>40%</span>
+            <div class="metric">
+              <svg aria-hidden="true"><use href="#i-drop"/></svg>
+              <dd>40%</dd>
             </div>
-            <div class="metric-item">
-              <svg><use href="#i-gust"></use></svg>
-              <span>15km/h</span>
+            <div class="metric">
+              <svg aria-hidden="true"><use href="#i-gust"/></svg>
+              <dd>15km/h</dd>
             </div>
-          </div>
+          </dl>
         </div>
 
-        <!-- Card B -->
-        <div class="card card-b">
+        <!-- Card B: North Jakarta -->
+        <div class="card card-row card-b" aria-label="North Jakarta: 12 degrees, Mostly Sunny">
           <div class="row-info">
             <span class="row-country">Indonesia</span>
             <span class="row-city">North Jakarta</span>
@@ -1246,12 +1290,12 @@
           </div>
           <div class="row-right">
             <span class="row-temp">12°</span>
-            <div class="row-icon"><svg><use href="#i-cloud"></use></svg></div>
+            <span class="row-icon" aria-hidden="true"><svg><use href="#i-cloud"/></svg></span>
           </div>
         </div>
 
-        <!-- Card C -->
-        <div class="card card-c">
+        <!-- Card C: Bandung -->
+        <div class="card card-row card-c" aria-label="Bandung: 10 degrees, Cloudy">
           <div class="row-info">
             <span class="row-country">Indonesia</span>
             <span class="row-city">Bandung</span>
@@ -1259,12 +1303,12 @@
           </div>
           <div class="row-right">
             <span class="row-temp">10°</span>
-            <div class="row-icon"><svg><use href="#i-cloud"></use></svg></div>
+            <span class="row-icon" aria-hidden="true"><svg><use href="#i-cloud"/></svg></span>
           </div>
         </div>
 
-        <!-- Card D -->
-        <div class="card card-d">
+        <!-- Card D: South Jakarta -->
+        <div class="card card-row card-d" aria-label="South Jakarta: 14 degrees, Sunny">
           <div class="row-info">
             <span class="row-country">Indonesia</span>
             <span class="row-city">South Jakarta</span>
@@ -1272,13 +1316,14 @@
           </div>
           <div class="row-right">
             <span class="row-temp">14°</span>
-            <div class="row-icon"><svg><use href="#i-cloud2"></use></svg></div>
+            <span class="row-icon" aria-hidden="true"><svg><use href="#i-cloud2"/></svg></span>
           </div>
         </div>
+
       </aside>
 
-    </div>
-  </div>
+    </div><!-- .stage-content -->
+  </div><!-- .stage -->
 
 </body>
 </html>
