@@ -2,7 +2,11 @@ import React from 'react';
 import { motion } from 'motion/react';
 import { ArrowUpRight, ChevronRight } from 'lucide-react';
 
-export const BottomRightCorner: React.FC = () => {
+interface BottomRightCornerProps {
+  onOpenDocs?: () => void;
+}
+
+export const BottomRightCorner: React.FC<BottomRightCornerProps> = ({ onOpenDocs }) => {
   return (
     <motion.div
       initial={{ y: 20, opacity: 0 }}
@@ -25,13 +29,16 @@ export const BottomRightCorner: React.FC = () => {
       </div>
 
       {/* Circle Icon */}
-      <div className="bg-[rgba(30,50,90,0.05)] w-10 h-10 md:w-14 md:h-14 rounded-full flex items-center justify-center border border-[rgba(30,50,90,0.1)] cursor-pointer hover:bg-[rgba(30,50,90,0.1)] transition-colors">
+      <div
+        onClick={onOpenDocs}
+        className="bg-[rgba(30,50,90,0.05)] w-10 h-10 md:w-14 md:h-14 rounded-full flex items-center justify-center border border-[rgba(30,50,90,0.1)] cursor-pointer hover:bg-[rgba(30,50,90,0.1)] transition-colors"
+      >
         <ArrowUpRight className="w-5 h-5 md:w-7 md:h-7 text-[rgba(30,50,90,0.8)]" />
       </div>
 
       {/* Info Column */}
-      <div className="flex flex-col">
-        <span className="text-[16px] md:text-[20px] font-normal text-[rgba(30,50,90,0.95)]">
+      <div className="flex flex-col" onClick={onOpenDocs}>
+        <span className="text-[16px] md:text-[20px] font-normal text-[rgba(30,50,90,0.95)] cursor-pointer hover:opacity-80 transition-opacity">
           Documentation
         </span>
         <div className="flex items-center gap-1 text-[rgba(30,50,90,0.6)] cursor-pointer hover:text-[rgba(30,50,90,0.8)] transition-colors">

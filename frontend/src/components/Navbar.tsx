@@ -2,19 +2,34 @@ import React from 'react';
 import { motion } from 'motion/react';
 import { ChevronRight, ArrowUpRight } from 'lucide-react';
 
+interface NavbarProps {
+  onOpenDemo?: () => void;
+  onNavigate?: (sectionId: string) => void;
+}
+
 interface NavItem {
   label: string;
+  sectionId: string;
   hasDropdown?: boolean;
 }
 
 const NAV_ITEMS: NavItem[] = [
-  { label: 'Ecosystem' },
-  { label: 'Economics', hasDropdown: true },
-  { label: 'Developers' },
-  { label: 'Governance', hasDropdown: true },
+  { label: 'Ecosystem', sectionId: 'ecosystem' },
+  { label: 'Economics', sectionId: 'economics', hasDropdown: true },
+  { label: 'Developers', sectionId: 'ecosystem' },
+  { label: 'Governance', sectionId: 'ecosystem', hasDropdown: true },
 ];
 
-export const Navbar: React.FC = () => {
+export const Navbar: React.FC<NavbarProps> = ({ onOpenDemo, onNavigate }) => {
+  const handleClick = (sectionId: string) => {
+    if (onNavigate) {
+      onNavigate(sectionId);
+    } else {
+      const el = document.getElementById(sectionId);
+      if (el) el.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   return (
     <nav className="flex items-center justify-between py-6 px-6 md:px-10 w-full relative z-10">
       {/* Left Side (hidden spacer for centering) */}
@@ -25,6 +40,7 @@ export const Navbar: React.FC = () => {
         {NAV_ITEMS.map((item) => (
           <li
             key={item.label}
+            onClick={() => handleClick(item.sectionId)}
             className="cursor-pointer hover:opacity-70 transition-opacity flex items-center gap-1 group"
           >
             <span>{item.label}</span>
@@ -45,6 +61,7 @@ export const Navbar: React.FC = () => {
       {/* Right Button */}
       <div className="flex-1 flex justify-end">
         <motion.button
+          onClick={onOpenDemo}
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
           className="flex items-center bg-[rgba(30,50,90,0.8)] text-white rounded-full pl-2 pr-4 md:pr-6 py-1.5 md:py-2 gap-2 md:gap-3 hover:bg-[rgba(30,50,90,1)] transition-colors group cursor-pointer"

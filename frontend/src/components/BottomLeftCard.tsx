@@ -2,7 +2,19 @@ import React from 'react';
 import { motion } from 'motion/react';
 import { ArrowUpRight } from 'lucide-react';
 
-export const BottomLeftCard: React.FC = () => {
+interface BottomLeftCardProps {
+  onJoinDiscord?: () => void;
+}
+
+export const BottomLeftCard: React.FC<BottomLeftCardProps> = ({ onJoinDiscord }) => {
+  const handleClick = () => {
+    if (onJoinDiscord) {
+      onJoinDiscord();
+    } else {
+      window.open('https://discord.com', '_blank');
+    }
+  };
+
   return (
     <motion.div
       initial={{ x: -20, opacity: 0 }}
@@ -15,6 +27,7 @@ export const BottomLeftCard: React.FC = () => {
         <span className="text-[10px] md:text-[12px] font-normal text-[rgba(30,50,90,0.6)] uppercase tracking-wider">Active Yielders</span>
       </div>
       <motion.button
+        onClick={handleClick}
         whileHover={{ scale: 1.02 }}
         whileTap={{ scale: 0.98 }}
         className="flex items-center bg-white rounded-full pl-1.5 pr-5 py-1.5 gap-2 hover:bg-white/90 transition-colors self-start group cursor-pointer"

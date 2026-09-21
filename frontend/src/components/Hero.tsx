@@ -5,7 +5,13 @@ import { HeroBadge } from './HeroBadge';
 import { BottomLeftCard } from './BottomLeftCard';
 import { BottomRightCorner } from './BottomRightCorner';
 
-export const Hero: React.FC = () => {
+interface HeroProps {
+  onOpenDemo: () => void;
+  onOpenDocs: () => void;
+  onNavigate: (sectionId: string) => void;
+}
+
+export const Hero: React.FC<HeroProps> = ({ onOpenDemo, onOpenDocs, onNavigate }) => {
   return (
     <div className="w-full h-screen flex items-center justify-center p-3 md:p-5 bg-[#f0f0f0]">
       <section className="relative w-full max-w-[1536px] h-full rounded-[1.5rem] md:rounded-[3rem] overflow-hidden shadow-none flex flex-col items-center bg-white/10 group">
@@ -25,7 +31,7 @@ export const Hero: React.FC = () => {
 
         {/* The Content Layer */}
         <div className="relative z-10 w-full h-full flex flex-col items-center">
-          <Navbar />
+          <Navbar onOpenDemo={onOpenDemo} onNavigate={onNavigate} />
 
           {/* Text Container */}
           <div className="w-full flex flex-col items-center pt-8 px-6 text-center max-w-4xl">
@@ -48,8 +54,8 @@ export const Hero: React.FC = () => {
             </motion.p>
           </div>
 
-          <BottomLeftCard />
-          <BottomRightCorner />
+          <BottomLeftCard onJoinDiscord={() => window.open('https://discord.com', '_blank')} />
+          <BottomRightCorner onOpenDocs={onOpenDocs} />
         </div>
       </section>
     </div>
